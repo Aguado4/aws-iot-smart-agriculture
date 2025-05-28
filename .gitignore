@@ -180,3 +180,9 @@ cython_debug/
 *.csr
 *.pfx
 *.p12
+.pem
+.crt
+.key
+.csr
+.pfx
+.p12
