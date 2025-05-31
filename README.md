@@ -226,7 +226,7 @@ ZONE_ID=zone1
    Published to smartagri/farm1/zone1/sensor/soil_npk/NPK01/telemetry: {...}
    Published to smartagri/farm1/zone1/sensor/weather_station/WS01/telemetry: {...}
    ```
-3. It repeats every 5 seconds. Press `Ctrl+C` to stop.
+3. It repeats every 15 seconds. Press `Ctrl+C` to stop.
 
 ---
 
@@ -395,7 +395,7 @@ Rules were set up in AWS IoT Core to send email alerts when:
 
 * **Soil Moisture** (`soil_moisture`) < 15%.
 * **Soil NPK** (`soil_npk`): N, P, or K < 2.
-* **Temperature** (`weather_station`) > 30°C.
+* **Temperature** (`weather_station`) > 33°C.
 
 Each rule publishes to the SNS topic `SmartAgriAlerts`, to which you subscribed via email.
 
