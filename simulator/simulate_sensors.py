@@ -64,7 +64,7 @@ client.configureCredentials(str(ROOT_CA), str(PRIVATE_KEY), str(CERTIFICATE))
 client.configureOfflinePublishQueueing(-1)  # infinite offline queue
 client.configureDrainingFrequency(2)          # 0.5 Hz draining
 client.configureConnectDisconnectTimeout(30)  # 30 sec
-client.configureMQTTOperationTimeout(5)       # 5 sec
+client.configureMQTTOperationTimeout(15)       # 15 sec
 
 # ===== Connect =====
 try:

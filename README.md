@@ -9,7 +9,42 @@ This repository contains a complete IoT solution for smart agriculture, using AW
 
 ---
 
-## 1. Sensor Descriptions
+## 1.  Research and Design
+
+Before implementation, research and design are crucial. As part of Phase 1, each group should:
+
+1. **Choose an IoT application sector**, such as:
+
+   * Agriculture
+   * Healthcare
+   * Logistics
+   * Energy
+   * Smart Cities
+   * Industry 4.0
+   * Etc.
+
+2. **Investigate which sensors and actuators** are typically used in that sector. For Agriculture, we focus on:
+
+   * Soil moisture sensors
+   * Soil nutrient sensors (NPK)
+   * Weather stations
+   * Irrigation valves
+   * Water pumps
+   * GPS collars for livestock
+   * (List other relevant sensors/actuators as needed)
+
+3. **Design MQTT topics** following best practices. Topics used in this project:
+
+   * `smartagri/{farm_id}/{zone_id}/sensor/soil_moisture/{sensor_id}/telemetry`
+   * `smartagri/{farm_id}/{zone_id}/sensor/soil_npk/{sensor_id}/telemetry`
+   * `smartagri/{farm_id}/{zone_id}/sensor/weather_station/{sensor_id}/telemetry`
+   * `smartagri/{farm_id}/{zone_id}/actuator/{actuator_type}/{actuator_id}/command`
+
+   Use hierarchical structure: `<project>/<farm>/<zone>/sensor/<type>/<id>/telemetry` and `<project>/<farm>/<zone>/actuator/<type>/<id>/command`.
+
+---
+
+## 2. Sensor Descriptions
 
 For this application, we use three simulated sensors relevant to smart agriculture:
 
@@ -63,7 +98,7 @@ For this application, we use three simulated sensors relevant to smart agricultu
 
 ---
 
-## 2. Repository Structure
+## 3. Repository Structure
 
 ```
 aws-iot-smart-agriculture/
@@ -88,7 +123,7 @@ aws-iot-smart-agriculture/
 
 ---
 
-## 3. General Prerequisites
+## 4. General Prerequisites
 
 Before running any component, you need:
 
@@ -109,7 +144,7 @@ Before running any component, you need:
 
 ---
 
-## 4. AWS IoT Core Setup (Certificates and Policies)
+## 5. AWS IoT Core Setup (Certificates and Policies)
 
 These steps were already performed for the simulator and subscriber; here is a summary:
 
@@ -152,15 +187,15 @@ These steps were already performed for the simulator and subscriber; here is a s
 
 ---
 
-## 5. Sensor Simulator (`simulator/`)
+## 6. Sensor Simulator (`simulator/`)
 
-### 5.1. Relevant Files
+### 6.1. Relevant Files
 
 * `simulate_sensors.py`: Python script that generates random data for each sensor and publishes it to AWS IoT Core.
 * `.env.example`: example of environment variables.
 * `certs/`: contains `AmazonRootCA1.pem`, `certificate.pem.crt`, `private.pem.key`.
 
-### 5.2. Environment Variables
+### 6.2. Environment Variables
 
 Copy `.env.example` to `.env` within `simulator/` and edit with your real values:
 
@@ -174,7 +209,7 @@ FARM_ID=farm1
 ZONE_ID=zone1
 ```
 
-### 5.3. Run the Simulator
+### 6.3. Run the Simulator
 
 1. In PowerShell:
 
@@ -195,33 +230,39 @@ ZONE_ID=zone1
 
 ---
 
-## 6. EC2 Subscriber (`ec2-subscriber/`)
+## 7. EC2 Subscriber (`ec2-subscriber/`)
 
-### 6.1. Upload Certificates to EC2
+### 7.1. Upload Certificates to EC2
 
-1. From Windows, run:
+1. From Windows (Git Bash):
 
-   ```powershell
-   scp -i "C:\keys\subscriberKey.pem" C:\keys\AmazonRootCA1.pem ec2-user@<EC2_IP>:~/certs/
-   scp -i "C:\keys\subscriberKey.pem" C:\keys\certificate.pem.crt ec2-user@<EC2_IP>:~/certs/
-   scp -i "C:\keys\subscriberKey.pem" C:\keys\private.pem.key ec2-user@<EC2_IP>:~/certs/
+   ```bash
+   ssh -i "C:\keys\subscriberKey.pem" ec2-user@13.219.88.87
    ```
-2. In the EC2 instance:
+2. On EC2:
 
    ```bash
    mkdir -p ~/certs
-   mv ~/AmazonRootCA1.pem    ~/certs/
-   mv ~/certificate.pem.crt  ~/certs/
-   mv ~/private.pem.key      ~/certs/
+   ```
+3. From Windows (Git Bash), upload certificates:
+
+   ```bash
+   scp -i "C:\keys\subscriberKey.pem" C:\keys\AmazonRootCA1.pem ec2-user@13.219.88.87:~/certs/
+   scp -i "C:\keys\subscriberKey.pem" C:\keys\certificate.pem.crt ec2-user@13.219.88.87:~/certs/
+   scp -i "C:\keys\subscriberKey.pem" C:\keys\private.pem.key ec2-user@13.219.88.87:~/certs/
+   ```
+4. On EC2:
+
+   ```bash
    chmod 600 ~/certs/*
    ```
 
-### 6.2. Prepare Environment on EC2
+### 7.2. Prepare Environment on EC2
 
-1. SSH into EC2:
+1. SSH into EC2 if not already (Git Bash):
 
    ```bash
-   ssh -i "~/keys/subscriberKey.pem" ec2-user@<EC2_IP>
+   ssh -i "C:\keys\subscriberKey.pem" ec2-user@13.219.88.87
    ```
 2. Install Docker, Git, Python:
 
@@ -239,9 +280,9 @@ ZONE_ID=zone1
    pip install AWSIoTPythonSDK psycopg2-binary python-dotenv
    ```
 
-### 6.3. Launch PostgreSQL in Docker
+### 7.3. Launch PostgreSQL in Docker
 
-1. Run:
+1. On EC2:
 
    ```bash
    sudo docker run --name iot-postgres \
@@ -280,7 +321,7 @@ ZONE_ID=zone1
          );"
    ```
 
-### 6.4. Configure `subscriber.py` and `.env`
+### 7.4. Configure `subscriber.py` and `.env`
 
 1. Clone your repository:
 
@@ -321,9 +362,9 @@ ZONE_ID=zone1
    load_dotenv(BASE_DIR / '.env')
    ```
 
-### 6.5. Run the Subscriber
+### 7.5. Run the Subscriber
 
-1. Activate the virtual environment:
+1. On EC2:
 
    ```bash
    source ~/venv/bin/activate
@@ -339,6 +380,8 @@ ZONE_ID=zone1
 3. Verify in the database:
 
    ```bash
+   sudo docker start iot-postgres
+
    sudo docker exec -it iot-postgres \
      psql -U iot_user -d iot_data \
      -c "SELECT * FROM sensor_events ORDER BY id DESC LIMIT 5;"
@@ -346,7 +389,7 @@ ZONE_ID=zone1
 
 ---
 
-## 7. IoT Core Rules + SNS (Phase 4)
+## 8. IoT Core Rules + SNS (Phase 4)
 
 Rules were set up in AWS IoT Core to send email alerts when:
 
@@ -358,9 +401,9 @@ Each rule publishes to the SNS topic `SmartAgriAlerts`, to which you subscribed 
 
 ---
 
-## 8. REST API with Chalice (`api-chalice/api/`)
+## 9. REST API with Chalice (`api-chalice/api/`)
 
-### 8.1. Structure and Files
+### 9.1. Structure and Files
 
 * `app.py`: defines these endpoints:
 
@@ -373,7 +416,7 @@ Each rule publishes to the SNS topic `SmartAgriAlerts`, to which you subscribed 
 * `requirements.txt`: includes `chalice`, `psycopg2-binary`, and `python-dotenv`.
 * `.chalice/config.json`: configures `"api_gateway_stage": null` for local testing.
 
-### 8.2. Environment Variables (`.env`)
+### 9.2. Environment Variables (`.env`)
 
 Place this file at:
 
@@ -391,72 +434,114 @@ DB_USER=iot_user
 DB_PASS=TuPasswordSegura
 ```
 
-### 8.3. Run Locally (Windows)
+### 9.3. Testing the System Locally (Windows)
 
-1. In PowerShell:
+This section details how to test each component end-to-end: connecting to EC2, starting subscriber, running simulator, verifying database, and testing API.
+
+#### 9.3.1. Connect to EC2 via Git Bash
+
+```bash
+ssh -i "C:\keys\subscriberKey.pem" ec2-user@13.219.88.87
+```
+
+#### 9.3.2. Activate the Virtual Environment and Start Subscriber on EC2
+
+```bash
+source ~/venv/bin/activate
+cd ~/aws-iot-smart-agriculture/ec2-subscriber
+python subscriber.py
+```
+
+#### 9.3.3. Run Simulator Locally (Windows PowerShell)
+
+```powershell
+cd "C:\Users\Juan Jose\Desktop\Universidad\iot\aws-iot-smart-agriculture\simulator"
+.\venv\Scripts\Activate
+python simulate_sensors.py
+```
+
+You will see logs in this window showing MQTT publications every 5 seconds.
+
+#### 9.3.4. Start and Verify Database Records on EC2
+
+In the same SSH session (open a new tab if you want to keep subscriber logs visible):
+
+```bash
+sudo docker start iot-postgres
+
+sudo docker exec -it iot-postgres \
+  psql -U iot_user -d iot_data \
+  -c "SELECT * FROM sensor_events ORDER BY id DESC LIMIT 5;"
+```
+
+You should see the latest sensor events inserted by the subscriber.
+
+#### 9.3.5. Run Chalice Locally (Windows PowerShell)
+
+1. In a new PowerShell window, navigate to the Chalice API folder:
 
    ```powershell
    cd "C:\Users\Juan Jose\Desktop\Universidad\iot\aws-iot-smart-agriculture\api-chalice\api"
    .\venv\Scripts\Activate
-   pip install --upgrade pip
-   pip install chalice psycopg2-binary python-dotenv
-   ```
-
-2. Ensure `.chalice/config.json` has:
-
-   ```json
-   "api_gateway_stage": null
-   ```
-
-3. Start Chalice locally:
-
-   ```powershell
    chalice local
    ```
 
-   You will see: `Serving on http://127.0.0.1:8000`. Keep that window open.
+   You should see:
 
-4. In another PowerShell window:
-
-   ```powershell
-   # List sensors
-   Invoke-RestMethod -Uri http://127.0.0.1:8000/sensors -Method GET
-
-   # Create a sensor
-   Invoke-RestMethod `
-     -Uri http://127.0.0.1:8000/sensors `
-     -Method POST `
-     -Body '{"id":"SM01","type":"soil_moisture","farm_id":"farm1","zone_id":"zone1"}' `
-     -ContentType 'application/json'
-
-   # Retrieve events for a sensor
-   Invoke-RestMethod -Uri http://127.0.0.1:8000/sensors/SM01/events -Method GET
-
-   # List actuators
-   Invoke-RestMethod -Uri http://127.0.0.1:8000/actuators -Method GET
-
-   # Create an actuator
-   Invoke-RestMethod `
-     -Uri http://127.0.0.1:8000/actuators `
-     -Method POST `
-     -Body '{"id":"AV01","type":"valve","farm_id":"farm1","zone_id":"zone1"}' `
-     -ContentType 'application/json'
+   ```
+   Serving on http://127.0.0.1:8000
    ```
 
-5. To **reset everything** (delete data) and start from zero, on the EC2:
+   Keep this window open to view logs for each API request.
 
-   ```bash
-   sudo docker exec -it iot-postgres psql -U iot_user -d iot_data
-   # Inside psql:
-   DELETE FROM sensor_events;
-   DELETE FROM sensors;
-   DELETE FROM actuators;
-   \q
-   ```
+#### 9.3.6. Test API Endpoints (Windows PowerShell)
+
+* **List Sensors**:
+
+  ```powershell
+  Invoke-RestMethod -Uri http://127.0.0.1:8000/sensors -Method GET
+  ```
+* **Register Sensor**:
+
+  ```powershell
+  Invoke-RestMethod `
+    -Uri http://127.0.0.1:8000/sensors `
+    -Method POST `
+    -Body '{"id":"SM01","type":"soil_moisture","farm_id":"farm1","zone_id":"zone1"}' `
+    -ContentType 'application/json'
+  ```
+* **Retrieve Events for a Sensor**:
+
+  ```powershell
+  Invoke-RestMethod -Uri http://127.0.0.1:8000/sensors/SM01/events -Method GET
+  ```
+* **List Actuators**:
+
+  ```powershell
+  Invoke-RestMethod -Uri http://127.0.0.1:8000/actuators -Method GET
+  ```
+* **Create Actuator**:
+
+  ```powershell
+  Invoke-RestMethod `
+    -Uri http://127.0.0.1:8000/actuators `
+    -Method POST `
+    -Body '{"id":"AV01","type":"valve","farm_id":"farm1","zone_id":"zone1"}' `
+    -ContentType 'application/json'
+  ```
+* **Delete All Data to Reset (Optional)**:
+
+  ```bash
+  sudo docker exec -it iot-postgres psql -U iot_user -d iot_data
+  DELETE FROM sensor_events;
+  DELETE FROM sensors;
+  DELETE FROM actuators;
+  \q
+  ```
 
 ---
 
-## 9. AWS Deployment
+## 10. AWS Deployment
 
 1. On your Windows machine, in `api-chalice/api` with the venv active:
 
@@ -476,7 +561,7 @@ DB_PASS=TuPasswordSegura
 
 ---
 
-## 10. Best Practices and Final Notes
+## 11. Best Practices and Final Notes
 
 * **Do not commit** any credentials or certificates to GitHub.
 * Verify Security Group rules for ports **22** (SSH), **8883** (MQTT), and **5432** (Postgres).
