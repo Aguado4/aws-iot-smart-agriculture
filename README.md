@@ -561,7 +561,24 @@ You should see the latest sensor events inserted by the subscriber.
 
 ---
 
-## 11. Best Practices and Final Notes
+## 11. Architecture Diagram
+
+### System Overview
+The solution uses AWS IoT Core to collect sensor data, EC2 for real-time processing, and Chalice for API management.
+
+![AWS IoT Architecture Diagram](images/architecture-diagram.png)  
+*Diagrama completo de la arquitectura (haz clic para ampliar)*
+
+### Key Components
+1. **Sensors**: Simulated devices publishing to AWS IoT Core via MQTT
+2. **AWS IoT Core**: Central message broker with rule-based processing
+3. **EC2 Instance**: Runs subscriber service and PostgreSQL database
+4. **Chalice API**: REST interface for data management
+5. **Amazon SNS**: Handles alert notifications
+
+---
+
+## 12. Best Practices and Final Notes
 
 * **Do not commit** any credentials or certificates to GitHub.
 * Verify Security Group rules for ports **22** (SSH), **8883** (MQTT), and **5432** (Postgres).
