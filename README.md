@@ -578,7 +578,25 @@ The solution uses AWS IoT Core to collect sensor data, Amazon SNS for alert noti
 
 ---
 
-## 12. Best Practices and Final Notes
+## 12. Star Schema Data Model
+
+The data warehouse uses a star schema design to efficiently store and analyze sensor data. The schema consists of:
+
+### Fact Table
+- **SensorTelemetryEvent**: Stores the actual measurements and readings from sensors
+  - Contains foreign keys to dimension tables
+  - Stores the actual measurement values and timestamps
+
+### Dimension Tables
+- **sensors**: Contains sensor metadata and attributes
+- **farms**: Contains farm information and location details
+- **zones**: Contains zone information within farms
+
+![Star Schema Diagram](images/star_schema.png)
+
+---
+
+## 13. Best Practices and Final Notes
 
 * **Do not commit** any credentials or certificates to GitHub.
 * Verify Security Group rules for ports **22** (SSH), **8883** (MQTT), and **5432** (Postgres).
