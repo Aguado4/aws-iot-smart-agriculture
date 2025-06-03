@@ -583,7 +583,7 @@ The solution uses AWS IoT Core to collect sensor data, EC2 for real-time process
 The data warehouse uses a star schema design to efficiently store and analyze sensor data. The schema consists of:
 
 ### Fact Table
-- **sensor_events**: Stores the actual measurements and readings from sensors
+- **SensorTelemetryEvent**: Stores the actual measurements and readings from sensors
   - Contains foreign keys to dimension tables
   - Stores the actual measurement values and timestamps
 
