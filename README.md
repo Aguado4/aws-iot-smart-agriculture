@@ -567,7 +567,7 @@ You should see the latest sensor events inserted by the subscriber.
 The solution uses AWS IoT Core to collect sensor data, EC2 for real-time processing, and Chalice for API management.
 
 ![AWS IoT Architecture Diagram](images/architecture-diagram.png)  
-*Diagrama completo de la arquitectura (haz clic para ampliar)*
+
 
 ### Key Components
 1. **Sensors**: Simulated devices publishing to AWS IoT Core via MQTT
